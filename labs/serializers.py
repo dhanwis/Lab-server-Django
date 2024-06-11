@@ -12,11 +12,12 @@ class UserSerializer(serializers.ModelSerializer):
         user = UserManage.objects.create_user(**validated_data)
         user.save()
         return user
+    
+   
+        
+        
+        
 
-class AdminSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Admin
-        fields = '__all__'
         
         
         
