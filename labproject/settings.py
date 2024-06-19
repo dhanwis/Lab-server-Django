@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'labs',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,20 @@ AUTH_USER_MODEL = 'labs.Usermanage'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+
+
+SMS_API_KEY='31739389-287f-11ef-8b60-0200cd936042'
+
+
+
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
