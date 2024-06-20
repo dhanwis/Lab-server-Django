@@ -4,6 +4,8 @@ from .models import *
 
 
 admin.site.register(UserManage)
+
 admin.site.register(Package)
 admin.site.register(Test)
 admin.site.register(Doctor)
+
