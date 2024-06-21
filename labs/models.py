@@ -17,7 +17,7 @@ class UserManage(AbstractUser):
     state = models.CharField(max_length=20,null=True,blank=True)
     status = models.CharField(max_length=20,default='enable')
     name = models.CharField(max_length=30,null=True,blank=True)
-    profile_pic = models.ImageField(upload_to="static/images/profile", blank=True, null=True)
+    profile_pic = models.ImageField(upload_to="media/", blank=True, null=True)
     pincode = models.CharField(max_length=20,null=True,blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True)
     otp_expiry = models.DateTimeField(blank=True, null=True)
@@ -71,6 +71,5 @@ class Doctor(models.Model):
         return self.doctorname
     
 
-# class TestReport(models.Model):
-#     customername =models
 
+h
