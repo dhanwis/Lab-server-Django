@@ -46,3 +46,68 @@ class Login(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({"user": serializer.data, "token": token.key}, status=status.HTTP_200_OK)
         return Response({"details": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
+    
+# class Status(APIView):
+#     def get(self,request,format=None,is_superuser= True):
+#         status = UserManage.objects.filter(id=id).update(status='Disable')
+#         serializer =UserSerializer(status)
+#         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+class packageAdd(APIView):
+    def get(self,request,format=None):
+        package = Package.objects.all()
+        serializer = PackageSerializers(package,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post(self,request,format=None):
+        serializer = PackageSerializers(data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+    
+class PackageEdit(APIView):
+    def get(self,request,format=None,package_id=None):
+        package=Package.objects.get(id=package_id)
+        serializer =PackageSerializers(package)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    def patch(self,request,package_id,format=None):
+        package=Package.objects.get(id=package_id)
+        serializer =PackageSerializers(package,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+    
+class TestAdd(APIView):
+    def get(self,request,format=None):
+        test = Test.objects.all()
+        serializer = testSerializers(test,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post(self,request,format=None):
+        serializer = testSerializers(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class DoctorAdd(APIView):
+    def get(self,request,format=None):
+        doctor = Doctor.objects.all()
+        serializer = DoctorsSerializers(doctor,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post(self,request,format=None):
+        serializer = DoctorsSerializers(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+
