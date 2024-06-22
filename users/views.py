@@ -3,17 +3,18 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 import random
 import datetime
 from .utils import send_otp
 from labs.models import UserManage  
-import requests
-from django.contrib.auth import authenticate, login
+
+from django.contrib.auth import login
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializers
-
-
+from rest_framework import viewsets
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import generics, permissions
 
 class UserRegistration(APIView):
     def post(self, request):
@@ -22,6 +23,7 @@ class UserRegistration(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class LoginView(APIView):
@@ -68,3 +70,52 @@ class VerifyOTPView(APIView):
         return Response({'access': str(refresh.access_token)}, status=status.HTTP_200_OK)
     else:
         return Response("Please enter the correct OTP", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# List Users: GET request to http://127.0.0.1:8000/api/users/
+# Retrieve a User: GET request to http://127.0.0.1:8000/api/users/<id>/
+# Create a User: POST request to http://127.0.0.1:8000/api/users/
+
+# {
+#   "email": "example@example.com",
+#   "contact": "1234567890",
+#   "profile_pic": "path/to/profile_pic.jpg",
+#   "address": "123 Street Name",
+#   "city": "City",
+#   "state": "State",
+#   "pincode": "123456",
+#   "name": "John Doe"
+# }
+
+
+# Update a User: PUT request to http://127.0.0.1:8000/api/users/<id>/ with a JSON body.
+# Delete a User: DELETE request to http://127.0.0.1:8000/api/users/<id>/
+
+class UpdateCurrentUserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        user = request.user
+        serializer = UserSerializers(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(is_customer=True)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request):
+        user = request.user
+        serializer = UserSerializers(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(is_customer=True)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        
+
