@@ -8,13 +8,16 @@ import random
 import datetime
 from .utils import send_otp
 from labs.models import UserManage  
-
+from labs.permissions import IsUser
 from django.contrib.auth import login
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializers
-from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework import generics, permissions
+from rest_framework import viewsets
+from labs.models import Reservation
+from .serializers import ReservationSerializer
+
+
 
 class UserRegistration(APIView):
     def post(self, request):
@@ -54,28 +57,26 @@ class LoginView(APIView):
 
 
 class VerifyOTPView(APIView):
- permission_classes = [AllowAny]
- def post(self, request, *args, **kwargs):
-    otp = request.data['otp']
-    print(otp)
-    user = UserManage.objects.get(otp=otp)
-    if user:
-        login(request, user)
-        user.otp = None
-        user.otp_expiry = None
-        user.max_otp_try = 3
-        user.otp_max_out = None
-        user.save()
-        refresh = RefreshToken.for_user(user)
-        return Response({'access': str(refresh.access_token)}, status=status.HTTP_200_OK)
-    else:
-        return Response("Please enter the correct OTP", status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = [AllowAny]
+    def post(self, request, *args, **kwargs):
+        otp = request.data['otp']
+        print(otp)
+        user = UserManage.objects.get(otp=otp)
+        if user:
+            login(request, user)
+            user.otp = None
+            user.otp_expiry = None
+            user.max_otp_try = 3
+            user.otp_max_out = None
+            user.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({'access': str(refresh.access_token)}, status=status.HTTP_200_OK)
+        else:
+            return Response("Please enter the correct OTP", status=status.HTTP_400_BAD_REQUEST)
 
 
 
-# List Users: GET request to http://127.0.0.1:8000/api/users/
-# Retrieve a User: GET request to http://127.0.0.1:8000/api/users/<id>/
-# Create a User: POST request to http://127.0.0.1:8000/api/users/
+
 
 # {
 #   "email": "example@example.com",
@@ -89,12 +90,16 @@ class VerifyOTPView(APIView):
 # }
 
 
-# Update a User: PUT request to http://127.0.0.1:8000/api/users/<id>/ with a JSON body.
-# Delete a User: DELETE request to http://127.0.0.1:8000/api/users/<id>/
+
 
 class UpdateCurrentUserView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsUser]
     authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializers(user)
+        return Response(serializer.data)
 
     def put(self, request):
         user = request.user
@@ -117,5 +122,16 @@ class UpdateCurrentUserView(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         
-        
+    
+
+class ReservationViewset(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsUser]
+    authentication_classes=[JWTAuthentication]
+    serializer_class=ReservationSerializer
+    
+    def get_queryset(self):
+        user=self.request.user
+        qs=Reservation.objects.filter(client=user)
+        return qs
+
 

@@ -5,7 +5,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class UserManage(AbstractUser):
     is_customer = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
     is_lab = models.BooleanField(default=False)
     labname = models.CharField(max_length=30)
     contact = models.CharField(max_length=100,null=True,blank=True)
@@ -40,27 +39,32 @@ class UserManage(AbstractUser):
         related_query_name='user_manage',
     
     )
+    
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_admin', True)
+        return self._create_user(username, email, password, **extra_fields)
 
-class Package(models.Model):
-    lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="labs")
-    packagename=models.CharField(max_length=20,null=True,blank=True)
-    tests=models.CharField(max_length=20)
-    price=models.IntegerField()
-    packageimage=models.FileField(upload_to='media/',null=True,blank=True)
 
-    def __str__(self):
-        return self.packagename
 
 class Test(models.Model):
-    customer=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="customer")
     testname=models.CharField(max_length=20)
-    package=models.ForeignKey(Package,on_delete=models.CASCADE,related_name='package')
     description=models.CharField(max_length=20)
     testprice=models.IntegerField()
     
     def __str__(self):
         return self.testname
     
+
+class Package(models.Model):
+    lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="labs")
+    packagename=models.CharField(max_length=20,null=True,blank=True)
+    tests=models.ForeignKey(Test,on_delete=models.CASCADE,related_name="tests")
+    price=models.IntegerField()
+    packageimage=models.FileField(upload_to='media/',null=True,blank=True)
+
+    def __str__(self):
+        return self.packagename
+
 
 class Doctor(models.Model):
     lab=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="lab_docter")
@@ -82,12 +86,19 @@ class TimeSlot(models.Model):
     def __str__(self):
         return f"{self.lab.name}: {self.start_time} - {self.end_time}"
     
-
+ 
 class Reservation(models.Model):
+    status_choice=[
+        ("pending","Pending"),
+        ("approved","Approved"),
+        ("rejected","Rejected")
+    ]
+    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="res_lab")
     client = models.ForeignKey(UserManage, on_delete=models.CASCADE, related_name='reservations')
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name='reservations')
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='reservations')
-    reservation_date = models.DateTimeField(auto_now_add=True)
+    reservation_date = models.DateTimeField()
+    status=models.CharField(max_length=10,choices=status_choice,default="pending")
 
     def save(self, *args, **kwargs):
         if self.time_slot.reservations.count() >= self.time_slot.max_clients:
