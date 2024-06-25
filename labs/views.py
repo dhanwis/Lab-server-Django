@@ -6,35 +6,82 @@ from rest_framework import status
 from .serializers import * 
 from django.contrib.auth import authenticate
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated , AllowAny,IsAdminUser
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import get_user_model
+from .permissions import IsLab
 # Create your views here.
 
 
+# {
+#     "labname": "Central Lab",
+#     'password':"pass@123"
+#     "contact": "123-456-7890",
+#     "email": "central.lab@example.com",
+#     "latitude": 37.7749,
+#     "longitude": -122.4194,
+#     "address": "123 Main Street",
+#     "city": "San Francisco",
+#     "state": "California",
+#     "profile_pic": "path/to/profile_pic.jpg",
+#     "pincode": "94103"
+# }
+
+
+class ObtainSuperuserToken(APIView):
+    def post(self, request, *args, **kwargs):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        
+        try:
+            user = get_user_model().objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.check_password(password) or not user.is_superuser:
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
+
 class LabAdd(APIView):
-    def get(self,request,format=None):
+    permission_classes = [IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, format=None):
         lab = UserManage.objects.filter(is_lab=True)
-        serializer = UserSerializer(lab,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    def post(self,request,format=None):
+        serializer = UserSerializer(lab, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
-        print(request.data)
         if serializer.is_valid():
             serializer.save(is_lab=True)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)  
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LabEdit(APIView):
-    def get(self,request,format=None,admin_id=None):
-        lab=UserManage.objects.get(id=admin_id)
-        serializer =UserSerializer(lab)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    def patch(self,request,admin_id,format=None):
-        lab=UserManage.objects.get(id=admin_id)
-        serializer =UserSerializer(lab,data=request.data,partial=True)
+    permission_classes=[IsAdminUser,IsLab]
+    authentication_classes=[TokenAuthentication]
+    def get(self, request, admin_id, format=None):
+        lab = get_object_or_404(UserManage, id=admin_id)
+        serializer = UserSerializer(lab)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, admin_id, format=None):
+        lab = get_object_or_404(UserManage, id=admin_id)
+        serializer = UserSerializer(lab, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
 class Login(APIView):
@@ -47,67 +94,44 @@ class Login(APIView):
             return Response({"user": serializer.data, "token": token.key}, status=status.HTTP_200_OK)
         return Response({"details": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
     
-# class Status(APIView):
-#     def get(self,request,format=None,is_superuser= True):
-#         status = UserManage.objects.filter(id=id).update(status='Disable')
-#         serializer =UserSerializer(status)
-#         return Response(serializer.data,status=status.HTTP_200_OK)
-    
-
-class packageAdd(APIView):
-    def get(self,request,format=None):
-        package = Package.objects.all()
-        serializer = PackageSerializers(package,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    def post(self,request,format=None):
-        serializer = PackageSerializers(data=request.data)
-        print(request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
-    
-class PackageEdit(APIView):
-    def get(self,request,format=None,package_id=None):
-        package=Package.objects.get(id=package_id)
-        serializer =PackageSerializers(package)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    def patch(self,request,package_id,format=None):
-        package=Package.objects.get(id=package_id)
-        serializer =PackageSerializers(package,data=request.data,partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
-    
-class TestAdd(APIView):
-    def get(self,request,format=None):
-        test = Test.objects.all()
-        serializer = testSerializers(test,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    def post(self,request,format=None):
-        serializer = testSerializers(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
 
 
+# GET lab/package/: List all tests.
+# POST lab/package/: Create a new test.
+# GET lab/package/{id}/: Retrieve a specific test by ID.
+# PUT lab/package/{id}/: Update a specific test by ID.
+# PATCH lab/package/{id}/: Partially update a specific test by ID.
+# DELETE lab/package/{id}/: Delete a specific test by ID.
 
-class DoctorAdd(APIView):
-    def get(self,request,format=None):
-        doctor = Doctor.objects.all()
-        serializer = DoctorsSerializers(doctor,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    def post(self,request,format=None):
-        serializer = DoctorsSerializers(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+class PackageViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsLab]
+    authentication_classes=[TokenAuthentication]
+    queryset=Package.objects.all()
+    serializer_class=PackageSerializers
 
+# GET lab/tests/: List all tests.
+# POST lab/tests/: Create a new test.
+# GET lab/tests/{id}/: Retrieve a specific test by ID.
+# PUT lab/tests/{id}/: Update a specific test by ID.
+# PATCH lab/tests/{id}/: Partially update a specific test by ID.
+# DELETE lab/tests/{id}/: Delete a specific test by ID.
+   
+class TestViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsLab]
+    authentication_classes=[TokenAuthentication]
+    queryset = Test.objects.all()
+    serializer_class = TestSerializers
+
+
+# GET lab/docter/: List all tests.
+# POST lab/docter/: Create a new test.
+# GET lab/docter/{id}/: Retrieve a specific test by ID.
+# PUT lab/docter/{id}/: Update a specific test by ID.
+# PATCH lab/docter/{id}/: Partially update a specific test by ID.
+# DELETE lab/docter/{id}/: Delete a specific test by ID.
+
+class DocterViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsLab]
+    authentication_classes=[TokenAuthentication]
+    queryset=Doctor.objects.all()
+    serializer_class=DoctorsSerializers

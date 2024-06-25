@@ -1,16 +1,17 @@
-from django.urls import path
+from django.urls import path,include
 from .views import *
+from rest_framework.routers import DefaultRouter
+
+
+router = DefaultRouter()
+router.register(r'tests', TestViewSet)
+router.register(r'docter',DocterViewSet),
+router.register(r'package',PackageViewSet)
 
 urlpatterns = [
     path('labadd/',LabAdd.as_view()),
     path('labedit/<int:admin_id>/',LabEdit.as_view()),
     path('login/',Login.as_view()),
-    path('packageadd/',packageAdd.as_view()),
-
-    path('packageedit/<int:package_id>/',PackageEdit.as_view()),
-    path('testadd/',TestAdd.as_view()),
-    path('doctoradd/',DoctorAdd.as_view())
-
-
-     
+    path('token/superuser/', ObtainSuperuserToken.as_view(), name='token_superuser_obtain'),
+    path('', include(router.urls)),     
 ]
