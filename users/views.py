@@ -20,6 +20,7 @@ from .serializers import ReservationSerializer
 
 
 class UserRegistration(APIView):
+    permission_classes=[AllowAny]
     def post(self, request):
         serializer = UserSerializers(data=request.data)
         if serializer.is_valid():
@@ -125,13 +126,12 @@ class UpdateCurrentUserView(APIView):
     
 
 class ReservationViewset(viewsets.ModelViewSet):
-    permission_classes=[IsAuthenticated,IsUser]
-    authentication_classes=[JWTAuthentication]
-    serializer_class=ReservationSerializer
+    permission_classes = [IsAuthenticated, IsUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = ReservationSerializer
     
     def get_queryset(self):
-        user=self.request.user
-        qs=Reservation.objects.filter(client=user)
-        return qs
+        user = self.request.user
+        return Reservation.objects.filter(client=user)
 
 

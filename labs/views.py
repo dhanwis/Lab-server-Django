@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from .permissions import IsLab
+from .permissions import IsLab,IsAdminAndLab
+from rest_framework_simplejwt.authentication import JWTAuthentication
 # Create your views here.
 
 
@@ -33,13 +34,16 @@ from .permissions import IsLab
 
 
 class ObtainSuperuserToken(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         username = request.data.get("username")
         password = request.data.get("password")
         
         try:
             user = get_user_model().objects.get(username=username)
-        except User.DoesNotExist:
+        except get_user_model().DoesNotExist:
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.check_password(password) or not user.is_superuser:
@@ -51,9 +55,12 @@ class ObtainSuperuserToken(APIView):
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
 
+
+
+
 class LabAdd(APIView):
     permission_classes = [IsAdminUser]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request, format=None):
         lab = UserManage.objects.filter(is_lab=True)
@@ -68,8 +75,8 @@ class LabAdd(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LabEdit(APIView):
-    permission_classes=[IsAdminUser,IsLab]
-    authentication_classes=[TokenAuthentication]
+    permission_classes=[AllowAny]
+    authentication_classes=[JWTAuthentication]
     def get(self, request, admin_id, format=None):
         lab = get_object_or_404(UserManage, id=admin_id)
         serializer = UserSerializer(lab)
@@ -85,13 +92,20 @@ class LabEdit(APIView):
     
     
 class Login(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
     def post(self, request, format=None):
         data = request.data
         user = authenticate(username=data.get('username'), password=data.get('password'))
         if user:
             serializer = UserSerializer(user)
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({"user": serializer.data, "token": token.key}, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "user": serializer.data,
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
         return Response({"details": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -105,7 +119,7 @@ class Login(APIView):
 
 class PackageViewSet(viewsets.ModelViewSet):
     permission_classes=[IsAuthenticated,IsLab]
-    authentication_classes=[TokenAuthentication]
+    authentication_classes=[JWTAuthentication]
     queryset=Package.objects.all()
     serializer_class=PackageSerializers
 
@@ -118,7 +132,7 @@ class PackageViewSet(viewsets.ModelViewSet):
    
 class TestViewSet(viewsets.ModelViewSet):
     permission_classes=[IsAuthenticated,IsLab]
-    authentication_classes=[TokenAuthentication]
+    authentication_classes=[JWTAuthentication]
     queryset = Test.objects.all()
     serializer_class = TestSerializers
 
@@ -132,6 +146,14 @@ class TestViewSet(viewsets.ModelViewSet):
 
 class DocterViewSet(viewsets.ModelViewSet):
     permission_classes=[IsAuthenticated,IsLab]
-    authentication_classes=[TokenAuthentication]
+    authentication_classes=[JWTAuthentication]
     queryset=Doctor.objects.all()
     serializer_class=DoctorsSerializers
+
+
+
+class TimeSlotViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsLab]
+    authentication_classes=[JWTAuthentication]
+    queryset=TimeSlot.objects.all()
+    serializer_class=TimeslotSerializers
