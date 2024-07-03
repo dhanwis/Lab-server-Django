@@ -26,11 +26,5 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date',"status"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Set the default value for the client field to the current user
-        if 'context' in kwargs and 'request' in kwargs['context']:
-            user = kwargs['context']['request'].user
-            self.fields['client'].default = user.id
             
             

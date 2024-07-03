@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render , get_object_or_404
 from rest_framework.decorators import APIView
 from .models import *
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import * 
+from users.serializers import ReservationSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework import viewsets
@@ -14,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
+from rest_framework_simplejwt.authentication import JWTAuthentication
 # Create your views here.
 
 
@@ -39,7 +41,7 @@ class ObtainSuperuserToken(APIView):
         
         try:
             user = get_user_model().objects.get(username=username)
-        except User.DoesNotExist:
+        except user.DoesNotExist:
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.check_password(password) or not user.is_superuser:
@@ -135,3 +137,23 @@ class DocterViewSet(viewsets.ModelViewSet):
     authentication_classes=[TokenAuthentication]
     queryset=Doctor.objects.all()
     serializer_class=DoctorsSerializers
+
+
+
+class TimeSlotViewSet(viewsets.ModelViewSet):
+    permission_classes=[IsAuthenticated,IsLab]
+    authentication_classes=[JWTAuthentication]
+    queryset=TimeSlot.objects.all()
+    serializer_class=TimeslotSerializers
+    
+    
+    
+    
+class ReservationView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, format=None):
+        reservations = Reservation.objects.all()
+        serializer = ReservationSerializer(reservations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

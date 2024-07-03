@@ -32,10 +32,11 @@ class DoctorsSerializers(serializers.ModelSerializer):
         model = Doctor
         fields ='__all__'
         
-        
-        
-
-        
+    
+class TimeslotSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = TimeSlot
+        fields = ['lab','start_time','end_time','max_clients']
         
         
         

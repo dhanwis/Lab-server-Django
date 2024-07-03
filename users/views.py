@@ -125,13 +125,18 @@ class UpdateCurrentUserView(APIView):
     
 
 class ReservationViewset(viewsets.ModelViewSet):
-    permission_classes=[IsAuthenticated,IsUser]
-    authentication_classes=[JWTAuthentication]
-    serializer_class=ReservationSerializer
-    
-    def get_queryset(self):
-        user=self.request.user
-        qs=Reservation.objects.filter(client=user)
-        return qs
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
 
+    def create(self, request, *args, **kwargs):
+        print(request.data)  # Add this line to inspect the data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Assuming you want to link the reservation to the user making the request
+        client = request.user
+        reservation = serializer.save(client=client)
+        
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
