@@ -18,6 +18,7 @@ class UserSerializers(serializers.ModelSerializer):
 
 class ReservationSerializer(serializers.ModelSerializer):
     lab = serializers.PrimaryKeyRelatedField(queryset=UserManage.objects.all())
+    # client=serializers.PrimaryKeyRelatedField(queryset=Reservation.objects.all())
     time_slot = serializers.PrimaryKeyRelatedField(queryset=TimeSlot.objects.all())
     test = serializers.PrimaryKeyRelatedField(queryset=Test.objects.all())
     
@@ -25,13 +26,6 @@ class ReservationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Reservation
-        fields = [ 'lab', 'time_slot', 'test', 'reservation_date',"status"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Set the default value for the client field to the current user
-        if 'context' in kwargs and 'request' in kwargs['context']:
-            user = kwargs['context']['request'].user
-            self.fields['client'].default = user.id
+        fields = [ 'lab','time_slot', 'test', 'reservation_date',"status"]
             
             

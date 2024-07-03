@@ -47,3 +47,4 @@ class TimeslotSerializers(serializers.ModelSerializer):
         fields = ['lab','start_time','end_time','max_clients']
         
         
+        

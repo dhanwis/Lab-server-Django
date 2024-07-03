@@ -14,5 +14,6 @@ urlpatterns = [
     path('labedit/<int:admin_id>/',LabEdit.as_view()),
     path('login/',Login.as_view()),
     path('token/superuser/', ObtainSuperuserToken.as_view(), name='token_superuser_obtain'),
+    path('reservationview/',ReservationView.as_view()),
     path('', include(router.urls)),     
 ]

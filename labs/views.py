@@ -4,6 +4,7 @@ from .models import *
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import * 
+from users .serializers import ReservationSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework import viewsets
@@ -152,8 +153,21 @@ class DocterViewSet(viewsets.ModelViewSet):
 
 
 
-class TimeSlotViewSet(viewsets.ModelViewSet):
+class  TimeSlotViewSet(viewsets.ModelViewSet):
     permission_classes=[IsAuthenticated,IsLab]
     authentication_classes=[JWTAuthentication]
     queryset=TimeSlot.objects.all()
     serializer_class=TimeslotSerializers
+
+
+class ReservationView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, format=None):
+        reservations = Reservation.objects.all()
+        serializer = ReservationSerializer(reservations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
