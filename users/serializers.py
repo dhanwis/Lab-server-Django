@@ -15,16 +15,17 @@ class UserSerializers(serializers.ModelSerializer):
 
 
 
+
 class ReservationSerializer(serializers.ModelSerializer):
     lab = serializers.PrimaryKeyRelatedField(queryset=UserManage.objects.all())
+    # client=serializers.PrimaryKeyRelatedField(queryset=Reservation.objects.all())
     time_slot = serializers.PrimaryKeyRelatedField(queryset=TimeSlot.objects.all())
     test = serializers.PrimaryKeyRelatedField(queryset=Test.objects.all())
-    client = serializers.PrimaryKeyRelatedField(read_only=True)
-    status=serializers.ChoiceField()
+    
+    
     
     class Meta:
         model = Reservation
-        fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date',"status"]
-
+        fields = [ 'lab','time_slot', 'test', 'reservation_date',"status"]
             
             

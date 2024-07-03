@@ -9,3 +9,5 @@ admin.site.register(Package)
 admin.site.register(Test)
 admin.site.register(Doctor)
 
+
+

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,Permission,Group
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.shortcuts import get_object_or_404
 # Create your models here.
 
 class UserManage(AbstractUser):
@@ -76,7 +77,7 @@ class Doctor(models.Model):
     def __str__(self) :
         return self.doctorname
     
-    
+
 class TimeSlot(models.Model):
     lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, related_name='time_slots')
     start_time = models.DateTimeField()

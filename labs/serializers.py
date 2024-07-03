@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from rest_framework.authtoken.models import Token
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserManage
@@ -9,21 +10,27 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-            password = validated_data.pop('password')
-            user = UserManage.objects.create(**validated_data)
-            user.set_password(password)
-            user.save()
-            return user
+        password = validated_data.pop('password')
+        validated_data['username'] = validated_data.get('email', '')
+        user = UserManage.objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
     
-class PackageSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Package
-        fields ='__all__'
+
 
 
 class TestSerializers(serializers.ModelSerializer):
     class Meta:
         model = Test
+        fields ='__all__'
+
+
+
+class PackageSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Package
         fields ='__all__'
     
 
@@ -32,7 +39,8 @@ class DoctorsSerializers(serializers.ModelSerializer):
         model = Doctor
         fields ='__all__'
         
-    
+        
+        
 class TimeslotSerializers(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot

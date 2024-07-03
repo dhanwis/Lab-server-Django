@@ -20,6 +20,7 @@ from .serializers import ReservationSerializer
 
 
 class UserRegistration(APIView):
+    permission_classes=[AllowAny]
     def post(self, request):
         serializer = UserSerializers(data=request.data)
         if serializer.is_valid():
@@ -124,9 +125,31 @@ class UpdateCurrentUserView(APIView):
         
     
 
+# class ReservationViewset(viewsets.ModelViewSet):
+#     permission_classes = [IsAuthenticated, IsUser]
+#     authentication_classes = [JWTAuthentication]
+#     queryset=Reservation.objects.all()
+#     serializer_class = ReservationSerializer
+    
+#     def get_queryset(self):
+#         user = self.request.user 
+#         return Reservation.objects.filter(client=user)
+
 class ReservationViewset(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+
+    def create(self, request, *args, **kwargs):
+        print(request.data)  # Add this line to inspect the data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Assuming you want to link the reservation to the user making the request
+        client = request.user
+        reservation = serializer.save(client=client)
+        
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def create(self, request, *args, **kwargs):
         print(request.data)  # Add this line to inspect the data
