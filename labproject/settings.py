@@ -132,3 +132,14 @@ AUTH_USER_MODEL = 'labs.Usermanage'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+# SMS_API_KEY = 'cbb1f952-2df3-11ef-8b60-0200cd936042'
+
+# from datetime import timedelta
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME':timedelta(minutes=5),
+#     'REFRESH_TOKEN_LIFETIME':timedelta(days=1),
+#     'ROTATE_REFRESH_TOKENS':True,
+#     'BLACKLIST_AFTER_ROTATION':True
+# }
