@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserManage
-        fields = ['labname', 'password', 'contact', 'email', 'latitude', 'longitude', 'address', 'city', 'state', 'profile_pic', 'pincode']
+        fields = ["username",'labname', 'password', 'contact', 'email', 'latitude', 'longitude', 'address', 'city', 'state', 'profile_pic', 'pincode']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -32,8 +32,11 @@ class DoctorsSerializers(serializers.ModelSerializer):
         model = Doctor
         fields ='__all__'
         
-        
-        
+class TimeSlotSerilaizer(serializers.ModelSerializer) :
+    class Meta:
+        model = TimeSlot
+        fields = '__all__'        
+
 
         
         

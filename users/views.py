@@ -16,10 +16,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets
 from labs.models import Reservation
 from .serializers import ReservationSerializer
+from labs.permissions import IsLab
 
 
 
 class UserRegistration(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserSerializers(data=request.data)
         if serializer.is_valid():

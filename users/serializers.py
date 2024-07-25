@@ -20,11 +20,11 @@ class ReservationSerializer(serializers.ModelSerializer):
     time_slot = serializers.PrimaryKeyRelatedField(queryset=TimeSlot.objects.all())
     test = serializers.PrimaryKeyRelatedField(queryset=Test.objects.all())
     client = serializers.PrimaryKeyRelatedField(read_only=True)
-    status=serializers.ChoiceField()
+    # status=serializers.ChoiceField()
     
     class Meta:
         model = Reservation
-        fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date',"status"]
+        fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date', 'status']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

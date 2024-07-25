@@ -3,7 +3,7 @@ from .views import *
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
-router.register(r"reservartion",ReservationViewset)
+router.register(r"reservartion",ReservationViewset, basename='reservation')
 
 
 urlpatterns = [
