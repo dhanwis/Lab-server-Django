@@ -133,7 +133,7 @@ class ReservationViewset(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user=self.request.user
-        qs=Reservation.objects.filter(client=user)
+        qs=Reservation.objects.filter(client=user)  
         return qs
 
 
