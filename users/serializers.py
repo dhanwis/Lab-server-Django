@@ -20,17 +20,15 @@ class ReservationSerializer(serializers.ModelSerializer):
     time_slot = serializers.PrimaryKeyRelatedField(queryset=TimeSlot.objects.all())
     test = serializers.PrimaryKeyRelatedField(queryset=Test.objects.all())
     client = serializers.PrimaryKeyRelatedField(read_only=True)
-    status=serializers.ChoiceField()
+    # status=serializers.ChoiceField()
     
     class Meta:
         model = Reservation
-        fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date',"status"]
+        fields = [ 'lab', 'client', 'time_slot', 'test', 'reservation_date', 'status']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Set the default value for the client field to the current user
-        if 'context' in kwargs and 'request' in kwargs['context']:
-            user = kwargs['context']['request'].user
-            self.fields['client'].default = user.id
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['client'] = user  # Set the client field to the current user
+        return super().create(validated_data)
             
             

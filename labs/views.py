@@ -14,12 +14,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
 # {
 #     "labname": "Central Lab",
-#     'password':"pass@123"
+#     "username" : "centrallab",
+#     "password":"pass@123",
 #     "contact": "123-456-7890",
 #     "email": "central.lab@example.com",
 #     "latitude": 37.7749,
@@ -27,19 +29,19 @@ from .permissions import IsLab
 #     "address": "123 Main Street",
 #     "city": "San Francisco",
 #     "state": "California",
-#     "profile_pic": "path/to/profile_pic.jpg",
 #     "pincode": "94103"
 # }
 
 
 class ObtainSuperuserToken(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         username = request.data.get("username")
         password = request.data.get("password")
         
         try:
             user = get_user_model().objects.get(username=username)
-        except User.DoesNotExist:
+        except user.DoesNotExist:
             return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.check_password(password) or not user.is_superuser:
@@ -52,7 +54,7 @@ class ObtainSuperuserToken(APIView):
         }, status=status.HTTP_200_OK)
 
 class LabAdd(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [AllowAny]
     authentication_classes = [TokenAuthentication]
 
     def get(self, request, format=None):
@@ -85,6 +87,7 @@ class LabEdit(APIView):
     
     
 class Login(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, format=None):
         data = request.data
         user = authenticate(username=data.get('username'), password=data.get('password'))
@@ -104,7 +107,7 @@ class Login(APIView):
 # DELETE lab/package/{id}/: Delete a specific test by ID.
 
 class PackageViewSet(viewsets.ModelViewSet):
-    permission_classes=[IsAuthenticated,IsLab]
+    permission_classes=[IsAuthenticated, IsLab]
     authentication_classes=[TokenAuthentication]
     queryset=Package.objects.all()
     serializer_class=PackageSerializers
@@ -135,3 +138,16 @@ class DocterViewSet(viewsets.ModelViewSet):
     authentication_classes=[TokenAuthentication]
     queryset=Doctor.objects.all()
     serializer_class=DoctorsSerializers
+
+# GET lab/timeslot/: List all timeslots.
+# POST lab/timeslot/: Create a new timeslot.
+# GET lab/timeslot/{id}/: Retrieve a specific timeslot by ID.
+# PUT lab/timeslot/{id}/: Update a specific timeslot by ID.
+# PATCH lab/timeslot/{id}/: Partially update a specific timeslot by ID.
+# DELETE lab/timelsot/{id}/: Delete a specific timeslot by ID
+
+class TimeSlotViewSet(viewsets.ModelViewSet) :
+    permission_classes = [IsAuthenticated, IsLab]
+    authentication_classes = [TokenAuthentication]
+    queryset = TimeSlot.objects.all()
+    serializer_class = TimeSlotSerilaizer

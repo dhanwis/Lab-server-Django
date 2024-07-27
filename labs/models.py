@@ -56,7 +56,7 @@ class Test(models.Model):
     
 
 class Package(models.Model):
-    lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="labs")
+    lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="labs")
     packagename=models.CharField(max_length=20,null=True,blank=True)
     tests=models.ForeignKey(Test,on_delete=models.CASCADE,related_name="tests")
     price=models.IntegerField()
@@ -67,7 +67,7 @@ class Package(models.Model):
 
 
 class Doctor(models.Model):
-    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="lab_docter")
+    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE,limit_choices_to={'is_lab': True}, related_name="lab_docter")
     doctorname=models.CharField(max_length=20)
     qualification=models.CharField(max_length=20)
     specialiazation=models.CharField(max_length=20)
@@ -78,13 +78,13 @@ class Doctor(models.Model):
     
     
 class TimeSlot(models.Model):
-    lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, related_name='time_slots')
+    lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name='time_slots')
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     max_clients = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.lab.name}: {self.start_time} - {self.end_time}"
+        return f"{self.lab.labname}: {self.start_time} - {self.end_time}"
     
  
 class Reservation(models.Model):
@@ -93,7 +93,7 @@ class Reservation(models.Model):
         ("approved","Approved"),
         ("rejected","Rejected")
     ]
-    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE,related_name="res_lab")
+    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="res_lab")
     client = models.ForeignKey(UserManage, on_delete=models.CASCADE, related_name='reservations')
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name='reservations')
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='reservations')
