@@ -11,6 +11,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
     path('users/update/', UpdateCurrentUserView.as_view(), name='update-current-user'),
+    path('users/testresult/<int:pk>/', TestresultDownloadAPIView.as_view(), name='test-result'),
+    path('users/test_review/', TestReviewAPIView.as_view(), name='test-review'),
     path('', include(router.urls)),
 ]
 

@@ -58,7 +58,7 @@ class Test(models.Model):
 class Package(models.Model):
     lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="labs")
     packagename=models.CharField(max_length=20,null=True,blank=True)
-    tests=models.ForeignKey(Test,on_delete=models.CASCADE,related_name="tests")
+    tests=models.ForeignKey(Test,on_delete=models.CASCADE,related_name="tests") 
     price=models.IntegerField()
     packageimage=models.FileField(upload_to='media/',null=True,blank=True)
 
@@ -106,7 +106,30 @@ class Reservation(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.client.name} - {self.test.name} on {self.time_slot.start_time}"
+        return f"{self.client.name} - {self.test.testname} on {self.time_slot.start_time}"
+    
+class TestResult(models.Model) :
+    user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='test_result')
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='test_result')
+    result_file = models.FileField(upload_to='test-result/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) :
+        return f"{self.user.name} - {self.test.testname}"
+    
+class TestReview(models.Model) :
+    user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='test_review')
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='test_reviews')
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class TestReviewReply(models.Model) :
+    lab_admin = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab' : True}, related_name='review_reply')
+    review = models.ForeignKey(TestReview, on_delete=models.CASCADE, related_name='test_review_reply')
+    reply = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 
     
 

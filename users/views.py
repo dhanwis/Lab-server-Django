@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 import random
 import datetime
 from .utils import send_otp
-from labs.models import UserManage  
+from labs.models import UserManage, TestResult, TestReview
 from labs.permissions import IsUser
 from django.contrib.auth import login
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,8 +15,9 @@ from .serializers import UserSerializers
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets
 from labs.models import Reservation
-from .serializers import ReservationSerializer
+from .serializers import ReservationSerializer, TestReviewSerializer
 from labs.permissions import IsLab
+from django.http import FileResponse
 
 
 
@@ -136,4 +137,27 @@ class ReservationViewset(viewsets.ModelViewSet):
         qs=Reservation.objects.filter(client=user)  
         return qs
 
+class TestresultDownloadAPIView(APIView) :
+    permission_classes=[IsAuthenticated,IsUser]
+    authentication_classes=[JWTAuthentication]
+
+    def get(self, request, pk, format=None):
+        try:
+            test_result = TestResult.objects.get(pk=pk, user=request.user)
+        except TestResult.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        response = FileResponse(test_result.result_file, as_attachment=True)
+        return response
+
+class TestReviewAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsUser]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, format=None) :
+        serializer = TestReviewSerializer(data=request.data)
+        if serializer.is_valid() :
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

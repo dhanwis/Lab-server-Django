@@ -30,5 +30,10 @@ class ReservationSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['client'] = user  # Set the client field to the current user
         return super().create(validated_data)
+
+class TestReviewSerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = TestReview
+        fields = '__all__'
             
             
