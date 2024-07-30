@@ -15,6 +15,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
 from django.shortcuts import get_object_or_404
+from users.serializers import TestReviewSerializer 
 # Create your views here.
 
 
@@ -151,3 +152,39 @@ class TimeSlotViewSet(viewsets.ModelViewSet) :
     authentication_classes = [TokenAuthentication]
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerilaizer
+
+class TestResultAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsLab]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, format = None) :
+        serializer = TestResultSerializer(data=request.data)
+        if serializer.is_valid() :
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TestReviewReplyAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsLab]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, test_id, format=None) :
+        reviews = TestReview.objects.filter(test_id=test_id)
+        serializer = TestReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, testreview_id, format=None):
+        try:
+            review = TestReview.objects.get(pk=testreview_id)
+        except TestReview.DoesNotExist:
+            return Response({'detail': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = request.data.copy()
+        data['review'] = testreview_id
+        serializer = TestReviewReplySerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save(lab_admin=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

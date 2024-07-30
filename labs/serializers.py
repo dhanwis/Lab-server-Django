@@ -37,6 +37,16 @@ class TimeSlotSerilaizer(serializers.ModelSerializer) :
         model = TimeSlot
         fields = '__all__'        
 
+class TestResultSerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = TestResult
+        fields = '__all__'
+
+class TestReviewReplySerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = TestReviewReply
+        fields = '__all__'
+
 
         
         
