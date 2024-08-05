@@ -4,9 +4,9 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register(r'tests', TestViewSet)
+router.register(r'tests', TestViewSet, basename='test')
 router.register(r'docter',DocterViewSet)
-router.register(r'package',PackageViewSet)
+router.register(r'package',PackageViewSet)  
 router.register(r'timeslot',TimeSlotViewSet)
 
 urlpatterns = [

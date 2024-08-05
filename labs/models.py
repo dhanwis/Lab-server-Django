@@ -47,6 +47,7 @@ class UserManage(AbstractUser):
 
 
 class Test(models.Model):
+    lab=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="tests")
     testname=models.CharField(max_length=20)
     description=models.CharField(max_length=20)
     testprice=models.IntegerField()

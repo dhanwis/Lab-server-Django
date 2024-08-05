@@ -121,10 +121,16 @@ class PackageViewSet(viewsets.ModelViewSet):
 # DELETE lab/tests/{id}/: Delete a specific test by ID.
    
 class TestViewSet(viewsets.ModelViewSet):
-    permission_classes=[IsAuthenticated,IsLab]
-    authentication_classes=[TokenAuthentication]
-    queryset = Test.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     serializer_class = TestSerializers
+
+    def get_queryset(self):
+        # Filter tests based on the logged-in user's lab
+        user = self.request.user
+        if user.is_lab:
+            return Test.objects.filter(lab=user)
+        return Test.objects.none()
 
 
 # GET lab/docter/: List all tests.
