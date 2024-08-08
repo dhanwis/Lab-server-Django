@@ -82,7 +82,7 @@ class TimeSlot(models.Model):
     lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name='time_slots')
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    max_clients = models.PositiveIntegerField()
+    max_clients = models.PositiveIntegerField() 
 
     def __str__(self):
         return f"{self.lab.labname}: {self.start_time} - {self.end_time}"
