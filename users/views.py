@@ -18,8 +18,8 @@ from labs.models import Reservation
 from .serializers import ReservationSerializer, TestReviewSerializer
 from labs.permissions import IsLab
 from django.http import FileResponse
-
-
+from labs.models import *
+from labs.serializers import *
 
 class UserRegistration(APIView):
     permission_classes = [AllowAny]
@@ -160,4 +160,14 @@ class TestReviewAPIView(APIView) :
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AllLabViewAPIView(APIView) :
+    permission_classes = [AllowAny]
+    def get(seld, request, format=None) :
+        labs = UserManage.objects.filter(is_lab=True)
+        serializer = UserSerializer(labs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 

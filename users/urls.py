@@ -13,6 +13,7 @@ urlpatterns = [
     path('users/update/', UpdateCurrentUserView.as_view(), name='update-current-user'),
     path('users/testresult/<int:pk>/', TestresultDownloadAPIView.as_view(), name='test-result'),
     path('users/test_review/', TestReviewAPIView.as_view(), name='test-review'),
+    path('all-labs/',AllLabViewAPIView.as_view(), name='all-labs-view'),
     path('', include(router.urls)),
 ]
 
