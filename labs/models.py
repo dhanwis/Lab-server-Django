@@ -7,7 +7,7 @@ class UserManage(AbstractUser):
     is_customer = models.BooleanField(default=False)
     is_lab = models.BooleanField(default=False)
     labname = models.CharField(max_length=30)
-    contact = models.CharField(max_length=100,null=True,blank=True)
+    contact = models.CharField(max_length=100,null=True,blank=True) 
     email = models.EmailField(max_length=150,null=True,blank=True)
     latitude = models.FloatField(validators=[MinValueValidator(-90), MaxValueValidator(90)],default=0.0)
     longitude = models.FloatField(validators=[MinValueValidator(-180), MaxValueValidator(180)],default=0.0)   
@@ -59,7 +59,7 @@ class Test(models.Model):
 class Package(models.Model):
     lab_name=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="labs")
     packagename=models.CharField(max_length=20,null=True,blank=True)
-    tests=models.ForeignKey(Test,on_delete=models.CASCADE,related_name="tests") 
+    tests=models.ManyToManyField(Test, related_name="packages") 
     price=models.IntegerField()
     packageimage=models.FileField(upload_to='media/',null=True,blank=True)
 

@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         return representation
     
 class PackageSerializers(serializers.ModelSerializer):
+    tests = serializers.PrimaryKeyRelatedField(many=True, queryset=Test.objects.all())  
     class Meta:
         model = Package
         fields ='__all__'
