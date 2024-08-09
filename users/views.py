@@ -163,11 +163,25 @@ class TestReviewAPIView(APIView) :
     
 class AllLabViewAPIView(APIView) :
     permission_classes = [AllowAny]
-    def get(seld, request, format=None) :
+    def get(self, request, format=None) :
         labs = UserManage.objects.filter(is_lab=True)
         serializer = UserSerializer(labs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
+class LabDetailAPIView(APIView) :
+    permission_classes = [AllowAny]
+    def get(self, request, usermanage_id) :
+        try :
+            lab=UserManage.objects.get(id=usermanage_id, is_lab=True)
+            serializer = UserSerializer(lab)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except :
+            return Response({'details' : 'No labs found'}, status=status.HTTP_404_NOT_FOUND)
+    
+class AllPackageAPIView(APIView) :
+    permission_classes=[AllowAny]
+    def get(self, request, format=None) :
+        packages = Package.objects.all()
+        serializer = PackageSerializers(packages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
