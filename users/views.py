@@ -185,3 +185,10 @@ class AllPackageAPIView(APIView) :
         serializer = PackageSerializers(packages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AllDoctorView(APIView) :
+    permission_classes=[AllowAny]
+    def get(self, request, format=None) :
+        doctors = Doctor.objects.all()
+        serializer = DoctorsSerializers(doctors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

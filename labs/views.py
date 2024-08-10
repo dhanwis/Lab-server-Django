@@ -24,6 +24,7 @@ from users.serializers import TestReviewSerializer
 #     "password":"pass@123",
 #     "contact": "123-456-7890",
 #     "email": "central.lab@example.com",
+#     "profile_pic": "path/to/profile_pic.jpg",
 #     "latitude": 37.7749,
 #     "longitude": -122.4194,
 #     "address": "123 Main Street",
