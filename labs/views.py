@@ -113,6 +113,13 @@ class PackageViewSet(viewsets.ModelViewSet):
     queryset=Package.objects.all()
     serializer_class=PackageSerializers
 
+    def get_queryset(self):
+        # Filter packages based on the logged-in user's lab
+        user = self.request.user
+        if user.is_lab:
+            return Package.objects.filter(lab_name=user)
+        return Package.objects.none()
+
 # GET lab/tests/: List all tests.
 # POST lab/tests/: Create a new test.
 # GET lab/tests/{id}/: Retrieve a specific test by ID.
@@ -146,6 +153,14 @@ class DocterViewSet(viewsets.ModelViewSet):
     queryset=Doctor.objects.all()
     serializer_class=DoctorsSerializers
 
+    def get_queryset(self):
+        # Filter docotors based on the logged-in user's lab
+        user = self.request.user
+        if user.is_lab:
+            return Doctor.objects.filter(lab=user)
+        return Doctor.objects.none()
+
+
 # GET lab/timeslot/: List all timeslots.
 # POST lab/timeslot/: Create a new timeslot.
 # GET lab/timeslot/{id}/: Retrieve a specific timeslot by ID.
@@ -158,6 +173,13 @@ class TimeSlotViewSet(viewsets.ModelViewSet) :
     authentication_classes = [TokenAuthentication]
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerilaizer
+    
+    def get_queryset(self):
+        # Filter timeslots based on the logged-in user's lab
+        user = self.request.user
+        if user.is_lab:
+            return TimeSlot.objects.filter(lab=user)
+        return TimeSlot.objects.none()
 
 class TestResultAPIView(APIView) :
     permission_classes = [IsAuthenticated, IsLab]
