@@ -206,3 +206,16 @@ class LabDoctorAPIView(APIView) :
         serializer = DoctorsSerializers(doctors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class LabpackageAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, lab_id) :
+        try :
+            lab = UserManage.objects.get(id=lab_id, is_lab=True)
+        except UserManage.DoesNotExist :
+            return Response ({'detail' : 'Lab not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        packages = Package.objects.filter(lab_name=lab)
+        serializer = PackageSerializers(packages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
