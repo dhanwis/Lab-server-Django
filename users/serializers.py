@@ -28,8 +28,13 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        validated_data['client'] = user  # Set the client field to the current user
-        return super().create(validated_data)
+        validated_data['client'] = user  
+        try :
+            reservation = super().create(validated_data)
+        except ValueError as e :
+            raise serializers.ValidationError({"detail" : str(e)})
+
+        return reservation
 
 class TestReviewSerializer(serializers.ModelSerializer) :
     class Meta :
