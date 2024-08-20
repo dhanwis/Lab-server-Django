@@ -73,7 +73,8 @@ class VerifyOTPView(APIView):
             user.otp_max_out = None
             user.save()
             refresh = RefreshToken.for_user(user)
-            return Response({'access': str(refresh.access_token)}, status=status.HTTP_200_OK)
+            return Response({'access': str(refresh.access_token),
+                            'user_id': user.id}, status=status.HTTP_200_OK)
         else:
             return Response("Please enter the correct OTP", status=status.HTTP_400_BAD_REQUEST)
 
