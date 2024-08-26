@@ -245,3 +245,16 @@ class LabTimeSlotAPIView(APIView) :
         timeslot = TimeSlot.objects.filter(lab=lab)
         serializer = TimeSlotSerilaizer(timeslot, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class AllTestReviewAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, test_id) :
+        try :
+            test = Test.objects.get(id=test_id)
+        except Test.DoesNotExist :
+            return Response({'details' : 'Test not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        testreview = TestReview.objects.filter(test=test)
+        serializer = TestReviewSerializer(testreview, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
