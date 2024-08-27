@@ -40,5 +40,9 @@ class TestReviewSerializer(serializers.ModelSerializer) :
     class Meta :
         model = TestReview
         fields = '__all__'
-            
+
+class LabReviewSerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = LabReview
+        fields = '__all__'
             

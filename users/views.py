@@ -15,7 +15,7 @@ from .serializers import UserSerializers
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets
 from labs.models import Reservation
-from .serializers import ReservationSerializer, TestReviewSerializer
+from .serializers import ReservationSerializer, TestReviewSerializer, LabReviewSerializer
 from labs.permissions import IsLab
 from django.http import FileResponse
 from labs.models import *
@@ -271,3 +271,26 @@ class UserDetailsAPIView(APIView) :
         except UserManage.DoesNotExist :
             return Response({'details' : 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
+class LabReviewAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsUser]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, format=None) :
+        serializer = LabReviewSerializer(data=request.data)
+        if serializer.is_valid() :
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AllReviewAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, lab_id) :
+        try :
+            lab = UserManage.objects.get(id=lab_id, is_lab=True)
+        except UserManage.DoesNotExist :
+            return Response({'details' : 'Lab not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        labreview = LabReview.objects.filter(lab=lab)
+        serializer = LabReviewSerializer(labreview, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

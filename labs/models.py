@@ -91,7 +91,7 @@ class TimeSlot(models.Model):
 class Reservation(models.Model):
     status_choice=[
         ("pending","Pending"),
-        ("approved","Approved"),
+        ("approved","Approved"),  
         ("rejected","Rejected")
     ]
     lab=models.ForeignKey(UserManage,on_delete=models.CASCADE, limit_choices_to={'is_lab': True}, related_name="res_lab")
@@ -130,6 +130,11 @@ class TestReviewReply(models.Model) :
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+class LabReview(models.Model) :
+    user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='lab_review')
+    lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab' : True}, related_name='lab')
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     
