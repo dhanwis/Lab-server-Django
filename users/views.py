@@ -258,3 +258,16 @@ class AllTestReviewAPIView(APIView) :
         testreview = TestReview.objects.filter(test=test)
         serializer = TestReviewSerializer(testreview, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class UserDetailsAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, usermanage_id) :
+        try :
+            user = UserManage.objects.get(id=usermanage_id, is_customer=True)
+            serializer = UserSerializers(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except UserManage.DoesNotExist :
+            return Response({'details' : 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
