@@ -132,7 +132,7 @@ class TestReviewReply(models.Model) :
 
 class LabReview(models.Model) :
     user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='lab_review')
-    lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab' : True}, related_name='lab')
+    lab = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_lab' : True})
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
