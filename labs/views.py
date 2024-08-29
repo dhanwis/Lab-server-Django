@@ -14,7 +14,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
 from django.shortcuts import get_object_or_404
-from users.serializers import TestReviewSerializer 
+from users.serializers import TestReviewSerializer, ReservationSerializer
 # Create your views here.
 
 
@@ -147,7 +147,7 @@ class TestViewSet(viewsets.ModelViewSet):
 # PATCH lab/docter/{id}/: Partially update a specific test by ID.
 # DELETE lab/docter/{id}/: Delete a specific test by ID.
 
-class DocterViewSet(viewsets.ModelViewSet):
+class DocterViewSet(viewsets.ModelViewSet): 
     permission_classes=[IsAuthenticated,IsLab]
     authentication_classes=[TokenAuthentication]
     queryset=Doctor.objects.all()
@@ -216,3 +216,16 @@ class TestReviewReplyAPIView(APIView) :
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AllReservationAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, lab_id) :
+        try :
+            lab = UserManage.objects.get(id=lab_id, is_lab=True)
+        except UserManage.DoesNotExist :
+            return Response({'details' : 'No lab Found'}, status= status.HTTP_404_NOT_FOUND)
+        
+        reservation = Reservation.objects.filter(lab=lab)
+        serializer = ReservationSerializer(reservation, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
