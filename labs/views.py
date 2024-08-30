@@ -229,3 +229,19 @@ class AllReservationAPIView(APIView) :
         reservation = Reservation.objects.filter(lab=lab)
         serializer = ReservationSerializer(reservation, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class ReservationStatusAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsLab]
+    authentication_classes = [TokenAuthentication]
+
+    def patch(self, request, pk, format=None) :
+        try :
+            reservation = Reservation.objects.get(pk=pk)
+        except Reservation.DoesNotExist :
+            return Response({'details' : 'No reservation found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ReservationStatusSerializer(reservation, data=request.data, partial=True)
+        if serializer.is_valid() :
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

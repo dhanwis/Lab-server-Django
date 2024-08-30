@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework.authtoken.models import Token
+from users.serializers import ReservationSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,8 +53,7 @@ class TestReviewReplySerializer(serializers.ModelSerializer) :
         model = TestReviewReply
         fields = '__all__'
 
-
-        
-        
-        
-        
+class ReservationStatusSerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = Reservation
+        fields = ['status']        
