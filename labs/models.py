@@ -98,8 +98,7 @@ class Reservation(models.Model):
     client = models.ForeignKey(UserManage, on_delete=models.CASCADE, related_name='reservations')
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name='reservations')
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='reservations')
-    reservation_date = models.DateTimeField()
-    status=models.CharField(max_length=10,choices=status_choice,default="pending")
+    status=models.CharField(max_length=10,choices=status_choice,default="pending")    
 
     def save(self, *args, **kwargs):
         if self.time_slot.reservations.count() >= self.time_slot.max_clients:
