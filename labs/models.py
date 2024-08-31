@@ -109,8 +109,7 @@ class Reservation(models.Model):
         return f"{self.client.name} - {self.test.testname} on {self.time_slot.start_time}"
     
 class TestResult(models.Model) :
-    user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='test_result')
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='test_result')
+    reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='test_result')
     result_file = models.FileField(upload_to='test-result/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
