@@ -24,7 +24,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Reservation
-        fields = [ 'lab', 'client', 'time_slot', 'test', 'status']
+        fields = [ 'id','lab', 'client', 'time_slot', 'test', 'status']
 
     def create(self, validated_data):
         user = self.context['request'].user
