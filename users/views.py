@@ -294,3 +294,17 @@ class AllReviewAPIView(APIView) :
         labreview = LabReview.objects.filter(lab=lab)
         serializer = LabReviewSerializer(labreview, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class TestResultAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsUser]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, reservation_id, format=None) :
+        try :
+            reservation = Reservation.objects.get(id=reservation_id) 
+        except Reservation.DoesNotExist :
+            return Response({'details' : 'Reservation not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        result = TestResult.objects.filter(reservation=reservation)
+        serializer = TestResultSerializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

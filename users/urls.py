@@ -25,5 +25,6 @@ urlpatterns = [
     path('userdata/<int:usermanage_id>/',UserDetailsAPIView.as_view(), name='userdata'),
     path('lab-review/', LabReviewAPIView.as_view(), name='lab-review'),
     path('lab-allreview/<int:lab_id>/', AllReviewAPIView.as_view(), name='lab-allreview'),
+    path('testresult/<int:reservation_id>/', TestResultAPIView.as_view(), name='testresult'),
     path('', include(router.urls)),
 ]

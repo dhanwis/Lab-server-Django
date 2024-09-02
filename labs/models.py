@@ -114,7 +114,7 @@ class TestResult(models.Model) :
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) :
-        return f"{self.user.name} - {self.test.testname}"
+        return f"{self.reservation.client.email} - {self.reservation.test.testname}"
     
 class TestReview(models.Model) :
     user = models.ForeignKey(UserManage, on_delete=models.CASCADE, limit_choices_to={'is_customer' : True}, related_name='test_review')
