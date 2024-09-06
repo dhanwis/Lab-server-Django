@@ -319,3 +319,15 @@ class TestDetailAPIView(APIView) :
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Test.DoesNotExist :
             return Response({'details' : 'Test not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class TimeSlotDetailAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, id, format=None) :
+        try :
+            timeslot = TimeSlot.objects.get(id=id)
+            serializer = TimeSlotSerilaizer(timeslot)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except TimeSlot.DoesNotExist :
+            return Response({'details' : 'Time slot not found'}, status=status.HTTP_404_NOT_FOUND)
+        
