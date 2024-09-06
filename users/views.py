@@ -308,3 +308,14 @@ class TestResultAPIView(APIView) :
         result = TestResult.objects.filter(reservation=reservation)
         serializer = TestResultSerializer(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class TestDetailAPIView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, id, format=None) :
+        try :
+            test = Test.objects.get(id=id)
+            serializer = TestSerializers(test)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Test.DoesNotExist :
+            return Response({'details' : 'Test not found'}, status=status.HTTP_404_NOT_FOUND)
