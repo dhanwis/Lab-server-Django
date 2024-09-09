@@ -14,7 +14,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
 from django.shortcuts import get_object_or_404
-from users.serializers import TestReviewSerializer, ReservationSerializer
+from users.serializers import TestReviewSerializer, ReservationSerializer, LabReviewSerializer
 # Create your views here.
 
 
@@ -245,3 +245,15 @@ class ReservationStatusAPIView(APIView) :
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class FeedbackAPIView(APIView) :
+    permission_classes = [IsAuthenticated, IsLab]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, format=None) :
+        user = request.user
+        feedback = LabReview.objects.filter(lab=user).order_by('-created_at')
+        serializer = LabReviewSerializer(feedback, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
