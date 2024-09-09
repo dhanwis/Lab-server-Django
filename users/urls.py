@@ -28,5 +28,6 @@ urlpatterns = [
     path('testresult/<int:reservation_id>/', TestResultAPIView.as_view(), name='testresult'),
     path('test-detail/<int:id>/', TestDetailAPIView.as_view(), name='test-detail'),
     path('timeslot-details/<int:id>/', TimeSlotDetailAPIView.as_view(), name='timeslot-details'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('', include(router.urls)),
 ]

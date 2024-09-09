@@ -20,6 +20,7 @@ from labs.permissions import IsLab
 from django.http import FileResponse
 from labs.models import *
 from labs.serializers import *
+from django.contrib.auth import logout
 
 class UserRegistration(APIView):
     permission_classes = [AllowAny]
@@ -330,4 +331,16 @@ class TimeSlotDetailAPIView(APIView) :
             return Response(serializer.data, status=status.HTTP_200_OK)
         except TimeSlot.DoesNotExist :
             return Response({'details' : 'Time slot not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class LogoutView(APIView) :
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request) :
+        try :
+            refresh_token = request.data.get("refresh_token")
+            token = RefreshToken(refresh_token)
+            token.blacklist
+            return Response({'message' : 'Successfully logged out'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
