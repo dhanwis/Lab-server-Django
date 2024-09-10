@@ -255,5 +255,12 @@ class FeedbackAPIView(APIView) :
         feedback = LabReview.objects.filter(lab=user).order_by('-created_at')
         serializer = LabReviewSerializer(feedback, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class AllFeedbackView(APIView) :
+    permission_classes = [AllowAny]
 
+    def get(self, request, format=None) :
+        feedback = LabReview.objects.all().order_by('-created_at')
+        serializer = LabReviewSerializer(feedback, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
