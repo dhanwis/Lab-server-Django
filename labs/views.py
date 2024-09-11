@@ -14,7 +14,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from .permissions import IsLab
 from django.shortcuts import get_object_or_404
-from users.serializers import TestReviewSerializer, ReservationSerializer, LabReviewSerializer
+from users.serializers import TestReviewSerializer, ReservationSerializer, LabReviewSerializer, UserSerializers
 # Create your views here.
 
 
@@ -60,11 +60,11 @@ class LabAdd(APIView):
 
     def get(self, request, format=None):
         lab = UserManage.objects.filter(is_lab=True)
-        serializer = UserSerializer(lab, many=True)
+        serializer = LabSerializer(lab, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
+        serializer = LabSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(is_lab=True)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -75,12 +75,12 @@ class LabEdit(APIView):
     authentication_classes=[TokenAuthentication]
     def get(self, request, admin_id, format=None):
         lab = get_object_or_404(UserManage, id=admin_id)
-        serializer = UserSerializer(lab)
+        serializer = LabSerializer(lab)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, admin_id, format=None):
         lab = get_object_or_404(UserManage, id=admin_id)
-        serializer = UserSerializer(lab, data=request.data, partial=True)
+        serializer = LabSerializer(lab, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -93,7 +93,7 @@ class Login(APIView):
         data = request.data
         user = authenticate(username=data.get('username'), password=data.get('password'))
         if user:
-            serializer = UserSerializer(user)
+            serializer = LabSerializer(user)
             token, created = Token.objects.get_or_create(user=user)
             return Response({"user": serializer.data, "token": token.key}, status=status.HTTP_200_OK)
         return Response({"details": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)

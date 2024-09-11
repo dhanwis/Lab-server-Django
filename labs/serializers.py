@@ -3,7 +3,7 @@ from .models import *
 from rest_framework.authtoken.models import Token
 from users.serializers import ReservationSerializer
 
-class UserSerializer(serializers.ModelSerializer):
+class LabSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserManage
         fields = ['id',"username",'labname', 'password', 'contact', 'email', 'latitude', 'longitude', 'address', 'city', 'state', 'profile_pic', 'pincode']
