@@ -272,4 +272,11 @@ class AllDoctorsView(APIView) :
         serializer = DoctorsSerializers(doctors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class AllUsersView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, format=None) :
+        users = UserManage.objects.filter(is_customer=True)
+        serializer = UserSerializers(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 

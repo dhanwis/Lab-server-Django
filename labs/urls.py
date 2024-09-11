@@ -21,5 +21,6 @@ urlpatterns = [
     path('lab-feedback/', FeedbackAPIView.as_view(), name='lab-feedback'),
     path('all-labfeedback/',AllFeedbackView.as_view(), name='all-labfeedback'),
     path('alldoctors/', AllDoctorsView.as_view(), name='alldoctors'),
+    path('allusers/', AllUsersView.as_view(), name='allusers'),
     path('', include(router.urls)),     
 ]
