@@ -20,5 +20,6 @@ urlpatterns = [
     path('reservation/status/<int:pk>/', ReservationStatusAPIView.as_view(), name='reservation-status'),
     path('lab-feedback/', FeedbackAPIView.as_view(), name='lab-feedback'),
     path('all-labfeedback/',AllFeedbackView.as_view(), name='all-labfeedback'),
+    path('alldoctors/', AllDoctorsView.as_view(), name='alldoctors'),
     path('', include(router.urls)),     
 ]

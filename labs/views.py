@@ -264,3 +264,12 @@ class AllFeedbackView(APIView) :
         serializer = LabReviewSerializer(feedback, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class AllDoctorsView(APIView) :
+    permission_classes = [AllowAny]
+
+    def get(self, request, format=None) :
+        doctors = Doctor.objects.all()
+        serializer = DoctorsSerializers(doctors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
