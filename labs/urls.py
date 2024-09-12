@@ -22,5 +22,6 @@ urlpatterns = [
     path('all-labfeedback/',AllFeedbackView.as_view(), name='all-labfeedback'),
     path('alldoctors/', AllDoctorsView.as_view(), name='alldoctors'),
     path('allusers/', AllUsersView.as_view(), name='allusers'),
+    path('labdelete/<int:pk>/', Labdelete.as_view(), name='labdelete'),
     path('', include(router.urls)),     
 ]

@@ -280,3 +280,10 @@ class AllUsersView(APIView) :
         serializer = UserSerializers(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class Labdelete(APIView) :
+    permission_classes = [AllowAny]
+
+    def delete(self, request, pk, format=None) :
+        lab = get_object_or_404(UserManage, pk=pk)
+        lab.delete()
+        return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
